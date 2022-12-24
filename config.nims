@@ -6,6 +6,7 @@ task build, "Builds a debug binary":
 task release, "Builds an optimized binary":
     switch("d","ssl")
     switch("d", "release")
+    switch("d","danger")
     switch("opt", "speed")
     switch("d", "strip")
     setcommand("c")
