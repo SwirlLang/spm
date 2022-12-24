@@ -1,5 +1,5 @@
 import utilities/[macros]
-import std/[os, strformat, strutils, terminal]
+import std/[os, strformat, strutils]
 importDir "libs"
 
 var
@@ -142,6 +142,9 @@ setControlCHook(exit)
 
 when not defined(ssl):
     {.fatal: "SSL is required to compile SPM".}
+
+when defined(windows):
+    {.warning: "SPM wasn't tested under a windows environment, please report any issues or consider switching to a better operating system such as GNU/Linux, BSD or MAC_OS".}
 
 when isMainModule:
     init()
