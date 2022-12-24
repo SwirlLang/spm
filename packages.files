@@ -1,11 +1,11 @@
 [{
-    "displayName":"Example tornado fragment",
-    "name":"example-tornado-fragment",
-    "description":"An example fragment (package) for tornado",
+    "displayName":"Example spm package",
+    "name":"example-spm-package",
+    "description":"An example package for spm",
     "author":"0x454d505459",
-    "upstreamURL":"https://github.com/0x454d505459/example-tornado-fragment.git",
-    "version":"vNone",
+    "upstreamURL":"https://github.com/0x454d505459/example-spm-package.git",
+    "version":"v0.0.1",
     "entryFile":"src/main.sw",
-    "requirements":["some-fragment"],
-    "conflics":["other-fragment"]
+    "requirements":[],
+    "conflics":[]
 }]
