@@ -10,7 +10,7 @@ The official package manager of the Swirl programming language.
 ### Process
  1) clone (or download the zip and extract): `git clone https://github.com/SwirlLang/spm.git`
  2) change directory: `cd spm`
- 3) compile: `nim -d:release -d:danger -d:strip --opt:speed -d:ssl c spm.nim`
+ 3) compile: `nim release spm.nim`
  4) get help: `./spm --help`
 
 ## Usage

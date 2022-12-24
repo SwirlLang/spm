@@ -19,7 +19,7 @@ proc fetchInstalledPackages*(installationDir:string,pathDelimiter:char, installe
 
 proc fetchOnlinePackageDatabase*():tuple =
     try:
-        let request = client.get("https://raw.githubusercontent.com/0x454d505459/spm/packages/packages.files")
+        let request = client.get("https://raw.githubusercontent.com/SwirlLang/spm/packages/packages.files")
         let remotePackageList = request.body()
         return (true, remotePackageList)
     except OSError:
@@ -52,10 +52,14 @@ Conflics with   : {packageConflics}"""
 
 proc fetchLocalPackageDatabase*(installationDir:string, pathDelimiter:char, availablePackagesSeq: var seq[Package], availablePackageNameSeq: var seq[string]) =
     let localDatabaseFile = readFile(installationDir & "packages.files")
-    availablePackagesSeq = localDatabaseFile.fromJson(seq[Package])
-    availablePackageNameSeq = @[]
-    for availablePackage in availablePackagesSeq:
-        availablePackageNameSeq.add(availablePackage.name)
+    try:
+        availablePackagesSeq = localDatabaseFile.fromJson(seq[Package])
+        availablePackageNameSeq = @[]
+        for availablePackage in availablePackagesSeq:
+            availablePackageNameSeq.add(availablePackage.name)
+    except JsonError:
+        echo "Error processing the local database, it may be corrupted, please redownload it manually"
+        quit(2)
 
 
 proc queryLocalPackageDatabase*(packageQuery:string, availablePackagesSeq: var seq[Package], availablePackageNameSeq: var seq[string]): tuple =
@@ -91,4 +95,8 @@ proc installPackageLocally*(packageToInstall:Package,installationDir:string,path
             return (false, &"Requested dependency {packageDependencie} is not in the database!")
 
         let installationStatus = installPackageLocally(availablePackagesSeq[packageDependencieIndex], installationDir, pathDelimiter, installedPackagesSeq, installedPackageNamesSeq, availablePackagesSeq, availablePackageNameSeq)
+        case installationStatus[0]
+        of true: continue
+        of false: return installationStatus
+        
     return (true, "Installed '" & packageToInstall.name & "'")
