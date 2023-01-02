@@ -19,7 +19,7 @@ proc init() =
     registerHelp(["l", "list"], "Lists all installed packages and their versions")
     registerHelp(["info", "--info"], "Lists all informations on an installed package")
     registerHelp(["s", "search    [ARGS]"], "Look through the database for package(s) matching the search query")
-    registerHelp(["I", "init"], "Starts the interactive package creation tool")
+    registerHelp(["I", "init    [ARGS]"], "Starts the interactive package creation tool")
     fetchInstalledPackages(installPath, pathSeparator, installedPackages, installedPackageNames)
     fetchLocalPackageDatabase(installPath, pathSeparator, availablePackages, availablePackageNames)
 
@@ -130,11 +130,34 @@ proc processCLIArguments() =
                 if not queryResults[0]:
                     warn queryResults[1]
 
-                
-        
         of "I", "-I", "init", "--init":
-            error "Not implemented yet"
-        
+            discardNext = true
+            var projectName = os.getCurrentDir().splitPath().tail
+            if paramCount() >= i+1: projectName = paramStr(i+1)
+            let projectId = projectName.toLowerAscii().replace(" ", "-")
+            warn "The curent directory will be used as the package dir"
+            info &"Using {projectName} for project display name"
+            info &"Using {projectId} for project id"
+
+            let 
+                author              = ask "Whos's the project author ? "
+                desc                = ask "Enter your package's description: "
+                entryFile           = ask "Where will the main file be located ? "
+                version             = ask "What is the initial package verson ? "
+                initGitRepoPrompt   = (ask "Whould you like me to initialize a git repo for you ? (y/n) ").toLowerAscii()
+
+            var inigitrepo = false
+            if initGitRepoPrompt == "y" or initGitRepoPrompt == "yes":
+                inigitrepo = true
+
+            let packageInitationStatus = initPackage(projectName,projectId,desc,author,entryFile,version,inigitrepo)
+
+            case packageInitationStatus[0]
+            of true:
+                success packageInitationStatus[1]
+            of false:
+                error packageInitationStatus[1]
+
         else:
             error "Unknow option: " & arg
             
@@ -147,6 +170,7 @@ when defined(windows):
     {.warning: "SPM wasn't tested under a windows environment, please report any issues or consider switching to a better operating system such as GNU/Linux, BSD or MAC_OS".}
 
 when isMainModule:
+    integrityChecks(basePath, pathSeparator)
     init()
     if paramCount() < 1:
         error "No argument provided, please check the help using 'spm --help'" 

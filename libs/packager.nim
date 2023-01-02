@@ -10,6 +10,7 @@ type
 
 let client = newHttpClient()
 
+
 proc fetchInstalledPackages*(installationDir:string,pathDelimiter:char, installedPackagesSeq: var seq[Package], installedPackageNamesSeq: var seq[string]) =
     installedPackagesSeq = @[]
     for packageDir in walkDirs(installationDir & "*"):
@@ -100,3 +101,55 @@ proc installPackageLocally*(packageToInstall:Package,installationDir:string,path
         of false: return installationStatus
         
     return (true, "Installed '" & packageToInstall.name & "'")
+
+
+proc writeDBFile(baseSPMDir:string, pathDelimiter:char)=
+    let fetchStatus = fetchOnlinePackageDatabase()
+    case fetchStatus[0]
+    of true:
+        writeFile(baseSPMDir & pathDelimiter & "packages" & pathDelimiter & "packages.files", fetchStatus[1])
+    of false:
+        writeFile(baseSPMDir & pathDelimiter & "packages" & pathDelimiter & "packages.files", "[]")
+
+proc createFS(baseSPMDir:string, pathDelimiter:char) =
+    os.createDir(baseSPMDir & pathDelimiter & "packages")
+    writeDBFile(baseSPMDir, pathDelimiter)
+
+proc integrityChecks*(baseSPMDir:string,pathDelimiter:char) =
+    if not dirExists(baseSPMDir):
+        os.createDir(baseSPMDir)
+        createFS(baseSPMDir, pathDelimiter)
+    
+    if not dirExists(baseSPMDir & pathDelimiter & "packages"):
+        createFS(baseSPMDir, pathDelimiter)
+    
+    if not fileExists(baseSPMDir & pathDelimiter & "packages" & pathDelimiter & "packages.files"):
+        writeDBFile(baseSPMDir, pathDelimiter)
+
+
+proc initPackage*(pkgname,pkgId,pkgdesc,pkgAuthor,pkgEntryFile,pkgVer:string, initGitRepo:bool):tuple =
+    writeFile("package.json", "{" & &"""
+"displayName":"{pkgname}",
+"name":"{pkgid}",
+"description":"{pkgdesc}",
+"author":"{pkgAuthor}",
+"upstreamURL":"",
+"version":"{pkgVer}",
+"entryFile":"{pkgEntryFile}",
+"requirements":[],
+"conflics":[]
+""" & "}")
+
+    let (subDirs, filename) = pkgEntryFile.splitPath()
+    os.createDir(subDirs)
+    writeFile(joinPath(subDirs, filename), "print(\"Hello Swirl !\")")
+
+    if initGitRepo:
+        let gitProcess = startProcess("git", ".", ["init"], options={poUsePath})
+        let gitProcessOutput = gitProcess.errorStream().readAll()
+        gitProcess.close()
+        if gitProcessOutput != "":
+            return (false, gitProcessOutput)
+
+
+    return (true, &"Successfully created new project {pkgId}")

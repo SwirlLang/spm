@@ -19,20 +19,20 @@ var
 {red}OPTIONS{dft}:"""
 
 proc error*(str: string) =
-    stdout.writeLine &"[{red}ERROR{dft}]      {str}"
+    stdout.writeLine &"{dft}[{red}ERROR{dft}]      {str}"
     quit(1)
 
 proc info*(str: string) =
-    stdout.writeLine &"[{blue}INFO{dft}]       {str}"
+    stdout.writeLine &"{dft}[{blue}INFO{dft}]       {str}"
 
 proc warn*(str: string) =
-    stdout.writeLine &"[{yellow}WARN{dft}]       {str}"
+    stdout.writeLine &"{dft}[{yellow}WARN{dft}]       {str}"
 
 proc ask*(str: string):string =
-    return read(&"[{yellow}QUESTION{dft}]   {str}")
+    return read(&"{dft}[{yellow}PROMPT{dft}]     {str}{blue}")
 
 proc success*(str: string) =
-    stdout.writeLine &"[{green}SUCCESS{dft}]    {str}" 
+    stdout.writeLine &"{dft}[{green}SUCCESS{dft}]    {str}" 
 
 proc registerHelp*(calls: array[0..1,string], desc:string) =
     let options = calls.join(", ")
