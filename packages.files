@@ -1,4 +1,5 @@
-[{
+[
+{
     "displayName":"Example spm package",
     "name":"example-spm-package",
     "description":"An example package for spm",
@@ -8,4 +9,16 @@
     "entryFile":"src/main.sw",
     "requirements":[],
     "conflics":[]
-}]
+}, 
+{
+    "displayName":"Hello World swirl package",
+    "name":"spm-hello-world",
+    "description":"An hello world package for swirl",
+    "author":"MrinmoyHaloi",
+    "upstreamURL":"https://github.com/MrinmoyHaloi/spm-hello-world",
+    "version":"v0.0.1",
+    "entryFile":"src/main.sw",
+    "requirements":[],
+    "conflics":[]
+}
+]
